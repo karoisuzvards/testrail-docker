@@ -1,28 +1,46 @@
-FROM ubuntu:trusty
+FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    php5 php5-cli php5-mysql php5-curl \
-    mysql-server \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get clean && apt-get update && apt-get install -y  --no-install-recommends software-properties-common
+
+RUN add-apt-repository ppa:ondrej/php && apt-get install -y --no-install-recommends \
+    php7.2 \
+    php7.2-mbstring \
+    php7.2-cli \
+    php7.2-common \
+    php7.2-mysql \
+    php7.2-curl \
+    php7.2-json \
+    php7.2-zip \
+    php7.2-xml \
+    apache2 \
     curl \
     unzip \
-    && rm -rf /var/lib/apt/lists/*
+    expect \
+    --fix-broken --fix-missing  && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN curl -O http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64_5.1.2.tar.gz && \
+RUN curl -O https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz && \
     tar vxfz ioncube_loaders_lin_*.tar.gz && \
     rm -f ioncube_loaders_lin_*.tar.gz
 
-RUN echo "zend_extension=/ioncube/ioncube_loader_lin_5.5.so" > /etc/php5/cli/php.ini.new && \
-    cat /etc/php5/cli/php.ini >> /etc/php5/cli/php.ini.new && \
-    mv /etc/php5/cli/php.ini.new /etc/php5/cli/php.ini && \
-    echo "zend_extension=/ioncube/ioncube_loader_lin_5.5.so" > /etc/php5/apache2/php.ini.new && \
-    cat /etc/php5/apache2/php.ini >> /etc/php5/apache2/php.ini.new && \
-    mv /etc/php5/apache2/php.ini.new /etc/php5/apache2/php.ini
+RUN echo "zend_extension=/ioncube/ioncube_loader_lin_7.2.so" > /etc/php/7.2/apache2/php.ini.new && \
+    cat /etc/php/7.2/apache2/php.ini >> /etc/php/7.2/apache2/php.ini.new && \
+    mv /etc/php/7.2/apache2/php.ini.new /etc/php/7.2/apache2/php.ini
 
 COPY testrail-*.zip /
 RUN cd /var/www/html && unzip -q /testrail-*.zip
 
 COPY config.php /var/www/html/testrail/config.php
-COPY testrail.sql /
+
+RUN mkdir /var/www/html/testrail/logs && \
+chown www-data /var/www/html/testrail/logs
+
+RUN echo '* * * * * www-data /usr/bin/php /var/www/html/testrail/task.php' > /etc/cron.d/testrail
+
+EXPOSE 80
+
 COPY run.sh /
 
-CMD /run.sh
+ENTRYPOINT /run.sh

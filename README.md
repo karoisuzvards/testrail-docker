@@ -4,14 +4,11 @@ Run [TestRail](http://www.gurock.com/testrail/) in a Docker container, for testi
 
 ## Prerequisites
 
-1. Download your version of TestRail from their website, and put it in the current directory (e.g. `testrail-5.3.0.3603-ion53.zip`).
+1. Download your version of TestRail from their website, and put it in the current directory (e.g. `testrail-5.6.x-ion53.zip`).
 1. Have your TestRail license key ready. You will need it later.
 
 This repository includes a minimal database dump (`testrail.sql`) that can be used as a starting point.
-If you want to use your own data, you can dump your existing TestRail database server and replace `testrail.sql` with the contents.
-For example:
-
-    mysqldump testrail > testrail.sql
+If you want to use your own data, you can dump your existing TestRail database server and replace `data/testrail.sql` with the contents.
 
 ## Build the Image
 
@@ -21,13 +18,13 @@ To build the image:
 
 ## Run the Container
 
-    ./start_container.sh
+    docker-compose up
 
 ## Usage
 
 Browse to:
 
-    http://localhost:7070/testrail/
+    http://localhost:8123/testrail/
 
 To log in:
 

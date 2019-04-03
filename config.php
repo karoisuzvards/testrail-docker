@@ -11,7 +11,7 @@
 */
 
 define('DB_DRIVER', 'mysql'); // sqlsrv or mysql
-define('DB_HOSTNAME', 'localhost');
+define('DB_HOSTNAME', 'mysql');
 define('DB_DATABASE', 'testrail');
 define('DB_USERNAME', 'testrail');
 define('DB_PASSWORD', 'newpassword');

@@ -1,0 +1,21 @@
+version: '3.5'
+services:
+  mysql:
+    container_name: mysql
+    image: nexus.citadele.lv:8082/mysql/mysql:5.5.60
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_USER=testrail
+      - MYSQL_PASSWORD=newpassword
+      - MYSQL_ROOT_PASSWORD=newpassword
+      - MYSQL_DATABASE=testrail
+  testrail:
+    container_name: testrail
+    image: testrail:latest
+    ports:
+      - "8123:80"
+#    links:
+#      - mysql
