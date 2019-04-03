@@ -1,33 +1,20 @@
-FROM ubuntu:18.04
+FROM php:7.2.16-apache-stretch
 
-ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+     unzip \
+     cron \
+     supervisor
 
-RUN apt-get clean && apt-get update && apt-get install -y  --no-install-recommends software-properties-common
+RUN docker-php-ext-install mysqli
 
-RUN add-apt-repository ppa:ondrej/php && apt-get install -y --no-install-recommends \
-    php7.2 \
-    php7.2-mbstring \
-    php7.2-cli \
-    php7.2-common \
-    php7.2-mysql \
-    php7.2-curl \
-    php7.2-json \
-    php7.2-zip \
-    php7.2-xml \
-    apache2 \
-    curl \
-    unzip \
-    expect \
-    --fix-broken --fix-missing  && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN curl -O https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz && \
-    tar vxfz ioncube_loaders_lin_*.tar.gz && \
+RUN mkdir /ioncube && \
+    curl -O https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz && \
+    tar vxfz ioncube_loaders_lin_*.tar.gz -C / && \
     rm -f ioncube_loaders_lin_*.tar.gz
 
-RUN echo "zend_extension=/ioncube/ioncube_loader_lin_7.2.so" > /etc/php/7.2/apache2/php.ini.new && \
-    cat /etc/php/7.2/apache2/php.ini >> /etc/php/7.2/apache2/php.ini.new && \
-    mv /etc/php/7.2/apache2/php.ini.new /etc/php/7.2/apache2/php.ini
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+RUN echo "zend_extension=/ioncube/ioncube_loader_lin_7.2.so" >> $PHP_INI_DIR/php.ini
 
 COPY testrail-*.zip /
 RUN cd /var/www/html && unzip -q /testrail-*.zip
@@ -37,10 +24,10 @@ COPY config.php /var/www/html/testrail/config.php
 RUN mkdir /var/www/html/testrail/logs && \
 chown www-data /var/www/html/testrail/logs
 
-RUN echo '* * * * * www-data /usr/bin/php /var/www/html/testrail/task.php' > /etc/cron.d/testrail
+RUN echo '* * * * * www-data php /var/www/html/testrail/task.php' >> /etc/crontab
 
 EXPOSE 80
 
-COPY run.sh /
+ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-ENTRYPOINT /run.sh
+ENTRYPOINT ["/usr/bin/supervisord"]
