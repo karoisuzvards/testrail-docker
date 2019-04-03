@@ -16,7 +16,7 @@ To build the image:
 
     docker build -t testrail .
 
-## Run the Container
+## Run the Container 
 
     docker-compose up
 
@@ -30,3 +30,6 @@ To log in:
 
 - Email address: `admin@admin.com`
 - Password: `admin`
+
+Problems:
+- migrate existing assets (screenshots, reports?) located in same dir where testrail code
