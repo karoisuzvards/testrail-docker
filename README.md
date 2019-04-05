@@ -9,6 +9,7 @@ Run [TestRail](http://www.gurock.com/testrail/) in a Docker container, for testi
 
 This repository includes a minimal database dump (`testrail.sql`) that can be used as a starting point.
 If you want to use your own data, you can dump your existing TestRail database server and replace `data/testrail.sql` with the contents.
+See mysql image documentation about data import for more.
 
 ## Build the Image
 
